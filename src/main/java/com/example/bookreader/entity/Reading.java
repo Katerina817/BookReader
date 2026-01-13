@@ -18,10 +18,6 @@ public class Reading {
     private ReadingStatus status;
 
     private LocalDateTime dateStartOfReading;
-    @PrePersist
-    protected void onCreate() {
-        dateStartOfReading = LocalDateTime.now();
-    }
 
     private LocalDateTime dateFinishOfReading;
 

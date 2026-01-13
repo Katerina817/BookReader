@@ -18,4 +18,5 @@ public interface ReadingRepository extends JpaRepository<Reading, UUID> {
 
     Optional<Reading> findByUserAndBook(User user, Book book);
 
+    boolean existsReadingByUserAndBook(User user, Book book);
 }
