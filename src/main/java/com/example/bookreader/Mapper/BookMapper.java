@@ -1,6 +1,6 @@
 package com.example.bookreader.Mapper;
 
-import com.example.bookreader.DTO.BookResponse;
+import com.example.bookreader.DTO.BookControllerDTO.BookResponse;
 import com.example.bookreader.entity.Book;
 
 import java.util.stream.Collectors;

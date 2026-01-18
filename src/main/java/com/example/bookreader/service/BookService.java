@@ -35,6 +35,11 @@ public class BookService {
         if(name!=null) book.setName(name);
         if(author!=null) book.setAuthor(author);
         if(description!=null) book.setDescription(description);
+        if(!(name==null || name.isBlank()) && !(author==null || author.isBlank())) {
+            if(!bookRepository.findByNameContainingIgnoreCaseAndAuthorContainingIgnoreCase(name, author).isEmpty()) {
+                throw new RuntimeException("Book already exists");
+            }
+        };
         return bookRepository.save(book);
     }
     public Book addBook(String name, String author, String description) {
@@ -44,6 +49,9 @@ public class BookService {
         }
         if (author == null || author.isBlank()) {
             throw new RuntimeException("Author is required");
+        }
+        if(!bookRepository.findByNameContainingIgnoreCaseAndAuthorContainingIgnoreCase(name, author).isEmpty()) {
+            throw new RuntimeException("Book already exists");
         }
         book.setName(name);
         book.setAuthor(author);

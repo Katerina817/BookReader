@@ -1,15 +1,21 @@
-package com.example.bookreader.DTO;
+package com.example.bookreader.DTO.BookControllerDTO;
+import java.util.Set;
+import java.util.UUID;
 
-import jakarta.validation.constraints.NotBlank;
-
-public class CreateBookRequest {
-    @NotBlank
+public class BookResponse {
+    private UUID uuid;
     private String name;
-
-    @NotBlank
     private String author;
-
     private String description;
+    private Set<String> genres;
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
 
     public String getName() {
         return name;
@@ -33,5 +39,13 @@ public class CreateBookRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Set<String> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(Set<String> genres) {
+        this.genres = genres;
     }
 }
