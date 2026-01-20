@@ -4,10 +4,8 @@ import com.example.bookreader.DTO.ReadingControllerDTO.CreateReadingRequest;
 import com.example.bookreader.DTO.ReadingControllerDTO.ReadingResponse;
 import com.example.bookreader.DTO.ReadingControllerDTO.UpdateReadingRequest;
 import com.example.bookreader.entity.Reading;
-import com.example.bookreader.entity.User;
 import com.example.bookreader.mapper.ReadingMapper;
 import com.example.bookreader.service.ReadingService;
-import com.example.bookreader.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 @Entity
@@ -58,7 +59,7 @@ public class Reading {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<Note> notes;
+    private List<Note> notes=new ArrayList<>();
 
     public Reading() {
     }

@@ -40,7 +40,11 @@ public class ReadingService {
         reading.setUser(user);
         reading.setBook(book);
         reading.setStatus(readingStatus);
-        if(dateStartOfReading!=null)reading.setDateStartOfReading(dateStartOfReading);
+        if(dateStartOfReading!=null){
+            reading.setDateStartOfReading(dateStartOfReading);
+        }else if(readingStatus == ReadingStatus.READING){
+            reading.setDateStartOfReading(LocalDateTime.now());
+        }
         return readingRepository.save(reading);
     }
     public Reading updateReading(UUID readingId, ReadingStatus newStatus, LocalDateTime dateStartOfReading, LocalDateTime dateEndOfReading,Integer evaluationOfCharacter, Integer evaluationOfPlot, Integer evaluationOfEmotions,Integer qualityOfDialog, Integer atmosphere, String review) {
