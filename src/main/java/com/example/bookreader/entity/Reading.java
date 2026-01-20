@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 @Entity
 @Table(name = "readings")
@@ -51,6 +52,13 @@ public class Reading {
 
     @Column(columnDefinition = "text")
     private String review;
+
+    @OneToMany(
+            mappedBy = "reading",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Note> notes;
 
     public Reading() {
     }
@@ -149,5 +157,13 @@ public class Reading {
 
     public void setReview(String review) {
         this.review = review;
+    }
+
+    public List<Note> getNotes() {
+        return notes;
+    }
+
+    public void setNotes(List<Note> notes) {
+        this.notes = notes;
     }
 }
