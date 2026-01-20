@@ -17,7 +17,5 @@ public class CreateReadingRequest {
     //сам вводит дату, либо она вообще скрыта, если статус не READING
     private LocalDateTime dateStartOfReading;
     @NotNull
-    private UUID userId;
-    @NotNull
     private UUID bookId;
 }

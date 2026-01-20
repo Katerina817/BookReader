@@ -26,12 +26,12 @@ public class ReadingService {
         return readingRepository.findById(readingId)
                 .orElseThrow(()->new RuntimeException("Reading not found"));
     }
-    public List<Reading> getAllReadingsByUser(UUID currentUserId) {
-        User user=userService.getUserById(currentUserId);
+    public List<Reading> getAllReadingsByUser() {
+        User user=getCurrentUser();
         return readingRepository.findByUser(user);
     }
-    public Reading createReading(UUID userId, UUID bookId) {
-        User user=userService.getUserById(userId);
+    public Reading createReading(UUID bookId,ReadingStatus readingStatus,LocalDateTime dateStartOfReading) {
+        User user=getCurrentUser();
         Book book=bookService.getBookById(bookId);
         if(readingRepository.existsReadingByUserAndBook(user,book)){
             throw new RuntimeException("Reading already exists");
@@ -39,7 +39,8 @@ public class ReadingService {
         Reading reading=new Reading();
         reading.setUser(user);
         reading.setBook(book);
-        reading.setStatus(ReadingStatus.PLAN);
+        reading.setStatus(readingStatus);
+        if(dateStartOfReading!=null)reading.setDateStartOfReading(dateStartOfReading);
         return readingRepository.save(reading);
     }
     public Reading updateReading(UUID readingId, ReadingStatus newStatus, LocalDateTime dateStartOfReading, LocalDateTime dateEndOfReading,Integer evaluationOfCharacter, Integer evaluationOfPlot, Integer evaluationOfEmotions,Integer qualityOfDialog, Integer atmosphere, String review) {
@@ -82,5 +83,10 @@ public class ReadingService {
     private boolean isRatingAllowed(Reading reading, ReadingStatus newStatus) {
         ReadingStatus status=newStatus!=null?newStatus:reading.getStatus();
         return status==ReadingStatus.FINISHED || status==ReadingStatus.DROPPED;
+    }
+    private User getCurrentUser() {
+        return userService.getUserById(
+                UUID.fromString("b719628e-4f7c-4835-8877-df732dac17a0")
+        );
     }
 }

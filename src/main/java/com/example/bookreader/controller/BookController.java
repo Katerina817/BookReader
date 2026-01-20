@@ -3,7 +3,7 @@ package com.example.bookreader.controller;
 import com.example.bookreader.DTO.BookControllerDTO.BookResponse;
 import com.example.bookreader.DTO.BookControllerDTO.CreateBookRequest;
 import com.example.bookreader.DTO.BookControllerDTO.UpdateBookRequest;
-import com.example.bookreader.Mapper.BookMapper;
+import com.example.bookreader.mapper.BookMapper;
 import com.example.bookreader.entity.Book;
 import com.example.bookreader.entity.Genre;
 import com.example.bookreader.service.BookService;

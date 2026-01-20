@@ -1,4 +1,4 @@
-package com.example.bookreader.Mapper;
+package com.example.bookreader.mapper;
 
 import com.example.bookreader.DTO.BookControllerDTO.BookResponse;
 import com.example.bookreader.entity.Book;

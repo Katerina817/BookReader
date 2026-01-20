@@ -3,18 +3,18 @@ import java.util.Set;
 import java.util.UUID;
 
 public class BookResponse {
-    private UUID uuid;
+    private UUID id;
     private String name;
     private String author;
     private String description;
     private Set<String> genres;
 
     public UUID getUuid() {
-        return uuid;
+        return id;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public void setUuid(UUID id) {
+        this.id = id;
     }
 
     public String getName() {
