@@ -30,7 +30,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody @Valid LoginRequest loginRequest) {
-        User user = authService.login(loginRequest);
-        return AuthMapper.toResponse(user);
+        return authService.login(loginRequest);
     }
 }

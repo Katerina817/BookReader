@@ -7,6 +7,7 @@ import com.example.bookreader.mapper.NoteMapper;
 import com.example.bookreader.entity.Note;
 import com.example.bookreader.service.NoteService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class NoteController {
         this.noteService = noteService;
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public NoteResponse createNote(
             @PathVariable UUID readingId,
@@ -30,6 +32,7 @@ public class NoteController {
         return NoteMapper.toResponse(note);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{noteId}")
     public void deleteNote(
             @PathVariable UUID readingId,
@@ -37,6 +40,7 @@ public class NoteController {
         noteService.deleteNote(readingId, noteId);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/{noteId}")
     public NoteResponse updateNote(
             @PathVariable UUID readingId,
@@ -46,6 +50,7 @@ public class NoteController {
         return NoteMapper.toResponse(note);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping
     public List<NoteResponse> getAllNotes(
             @PathVariable UUID readingId

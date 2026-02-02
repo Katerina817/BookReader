@@ -7,6 +7,7 @@ import com.example.bookreader.entity.Reading;
 import com.example.bookreader.mapper.ReadingMapper;
 import com.example.bookreader.service.ReadingService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class ReadingController {
         this.readingService = readingService;
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public ReadingResponse createReading(@RequestBody @Valid CreateReadingRequest request) {
          Reading reading= readingService.createReading(
@@ -31,11 +33,13 @@ public class ReadingController {
          return ReadingMapper.toReadingResponse(reading);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{id}")
     public void deleteReading(@PathVariable UUID id) {
         readingService.deleteReading(id);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PatchMapping("/{id}")
     public ReadingResponse updateReading(
             @PathVariable UUID id,
@@ -55,6 +59,7 @@ public class ReadingController {
         return ReadingMapper.toReadingResponse(reading);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping
     public List<ReadingResponse> getAllReadingsByUser() {
         return readingService.getAllReadingsByUser()

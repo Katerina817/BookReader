@@ -7,4 +7,5 @@ import java.util.UUID;
 public class AuthResponse {
     private String login;
     private UUID userId;
+    private String token;
 }
