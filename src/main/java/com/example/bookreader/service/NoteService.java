@@ -34,7 +34,7 @@ public class NoteService {
         if (content==null || content.isBlank()) {
             throw new RuntimeException("Content is required");
         }
-        Reading reading=readingService.getReadingById(readingId);
+        readingService.getReadingById(readingId);
         Note note=noteRepository.findById(noteId).
                 orElseThrow(() -> new RuntimeException("Note not found"));
         if(!note.getReading().getId().equals(readingId)){
@@ -44,7 +44,7 @@ public class NoteService {
         return noteRepository.save(note);
     }
     public void deleteNote(UUID readingId, UUID noteId) {
-        Reading reading=readingService.getReadingById(readingId);
+        readingService.getReadingById(readingId);
         Note note=noteRepository.findById(noteId).
                 orElseThrow(() -> new RuntimeException("Note not found"));
         if(!note.getReading().getId().equals(readingId)){

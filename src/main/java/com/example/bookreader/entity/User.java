@@ -26,7 +26,7 @@ public class User implements UserDetails {
     private Role role;
 
     @Getter
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false,unique = true,length = 50)

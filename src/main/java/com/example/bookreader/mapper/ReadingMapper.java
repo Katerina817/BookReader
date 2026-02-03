@@ -6,7 +6,6 @@ import com.example.bookreader.entity.Reading;
 public class ReadingMapper {
     public static ReadingResponse toReadingResponse(Reading reading) {
         ReadingResponse dto = new ReadingResponse();
-        dto.setId(reading.getId());
         dto.setReadingStatus(reading.getStatus());
         dto.setDateStartOfReading(reading.getDateStartOfReading());
         dto.setDateFinishOfReading(reading.getDateFinishOfReading());

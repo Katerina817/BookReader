@@ -23,8 +23,13 @@ public class ReadingService {
         this.bookService = bookService;
     }
     public Reading getReadingById(UUID readingId) {
-        return readingRepository.findById(readingId)
+        User user=getCurrentUser();
+        Reading reading = readingRepository.findById(readingId)
                 .orElseThrow(()->new RuntimeException("Reading not found"));
+        if(!reading.getUser().getId().equals(user.getId())){
+            throw new RuntimeException("Reading user id not match");
+        }
+        return reading;
     }
     public List<Reading> getAllReadingsByUser() {
         User user=getCurrentUser();
@@ -89,8 +94,6 @@ public class ReadingService {
         return status==ReadingStatus.FINISHED || status==ReadingStatus.DROPPED;
     }
     private User getCurrentUser() {
-        return userService.getUserById(
-                UUID.fromString("b719628e-4f7c-4835-8877-df732dac17a0")
-        );
+        return userService.getCurrentUser();
     }
 }
