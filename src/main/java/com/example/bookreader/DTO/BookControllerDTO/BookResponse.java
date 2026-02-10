@@ -7,8 +7,16 @@ public class BookResponse {
     private String name;
     private String author;
     private String description;
+    private Boolean isPrivate;
     private Set<String> genres;
 
+    public Boolean getPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(Boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
     public UUID getUuid() {
         return id;
     }

@@ -1,6 +1,9 @@
 package com.example.bookreader.DTO.BookControllerDTO;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.UUID;
 
 public class CreateBookRequest {
     @NotBlank
@@ -10,6 +13,17 @@ public class CreateBookRequest {
     private String author;
 
     private String description;
+
+    @NotNull
+    private Boolean isPrivate;
+
+    public Boolean getPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(Boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
 
     public String getName() {
         return name;

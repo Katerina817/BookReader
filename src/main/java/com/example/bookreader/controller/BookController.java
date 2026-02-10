@@ -29,7 +29,8 @@ public class BookController {
         Book book=bookService.addBook(
                 request.getName(),
                 request.getAuthor(),
-                request.getDescription()
+                request.getDescription(),
+                request.getPrivate()
         );
         return BookMapper.toResponse(book);
     }
@@ -40,7 +41,8 @@ public class BookController {
                 id,
                 request.getName(),
                 request.getAuthor(),
-                request.getDescription()
+                request.getDescription(),
+                request.getPrivate()
         );
         return BookMapper.toResponse(book);
     }

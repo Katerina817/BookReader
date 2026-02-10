@@ -23,6 +23,13 @@ public class Book {
     @Column(columnDefinition = "text")
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(nullable = false, name = "isPrivate")
+    private Boolean isPrivate;
+
     public Book() {}
 
     @ManyToMany
@@ -33,6 +40,20 @@ public class Book {
     )
     private Set<Genre> genres=new HashSet<>();
 
+    public Boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(Boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
     public Set<Genre> getGenres() {
         return genres;
     }

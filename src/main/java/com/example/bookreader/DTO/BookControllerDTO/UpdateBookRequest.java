@@ -7,6 +7,8 @@ public class UpdateBookRequest {
 
     private String description;
 
+    private Boolean isPrivate;
+
     public String getName() {
         return name;
     }
@@ -31,4 +33,11 @@ public class UpdateBookRequest {
         this.description = description;
     }
 
+    public Boolean getPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(Boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
 }

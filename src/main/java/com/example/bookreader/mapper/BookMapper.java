@@ -11,6 +11,7 @@ public class BookMapper {
         dto.setUuid(book.getId());
         dto.setName(book.getName());
         dto.setAuthor(book.getAuthor());
+        dto.setPrivate(book.isPrivate());
         dto.setDescription(book.getDescription());
         dto.setGenres(book.getGenres()
                 .stream()
