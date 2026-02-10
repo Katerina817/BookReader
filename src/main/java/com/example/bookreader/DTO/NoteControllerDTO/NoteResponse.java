@@ -8,6 +8,7 @@ import java.util.UUID;
 public class NoteResponse {
     private UUID id;
     private String content;
+    private String quote;
     private LocalDateTime dateOfCreation;
     private UUID readingId;
 }

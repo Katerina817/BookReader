@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 @Data
 public class ReadingResponse {
+    private UUID id;
     private ReadingStatus readingStatus;
     private LocalDateTime dateStartOfReading;
     private LocalDateTime dateFinishOfReading;

@@ -28,7 +28,7 @@ public class NoteController {
     public NoteResponse createNote(
             @PathVariable UUID readingId,
             @RequestBody @Valid CreateNoteRequest request) {
-        Note note = noteService.createNote(readingId, request.getContent());
+        Note note = noteService.createNote(readingId, request.getContent(),request.getQuote());
         return NoteMapper.toResponse(note);
     }
 
@@ -46,7 +46,7 @@ public class NoteController {
             @PathVariable UUID readingId,
             @PathVariable UUID noteId,
             @RequestBody @Valid UpdateNoteRequest request){
-        Note note=noteService.updateNote(readingId,noteId,request.getContent());
+        Note note=noteService.updateNote(readingId,noteId,request.getContent(),request.getQuote());
         return NoteMapper.toResponse(note);
     }
 

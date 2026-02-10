@@ -12,8 +12,11 @@ public class Note {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(columnDefinition = "text",nullable = false)
+    @Column(columnDefinition = "text")
     private String content;
+
+    @Column(columnDefinition = "text")
+    private String quote;
 
     private LocalDateTime dateOfCreation;
     @PrePersist
@@ -57,5 +60,12 @@ public class Note {
 
     public void setReading(Reading reading) {
         this.reading = reading;
+    }
+    public String getQuote() {
+        return quote;
+    }
+
+    public void setQuote(String quote) {
+        this.quote = quote;
     }
 }

@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class CreateNoteRequest {
-    @NotBlank
     private String content;
+    private String quote;
 }

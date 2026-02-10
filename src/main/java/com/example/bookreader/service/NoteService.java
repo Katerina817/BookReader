@@ -16,13 +16,14 @@ public class NoteService {
         this.noteRepository = noteRepository;
         this.readingService = readingService;
     }
-    public Note createNote(UUID readingId, String content) {
-        if (content==null || content.isBlank()) {
-            throw new RuntimeException("Note content cannot be empty");
+    public Note createNote(UUID readingId, String content, String quote) {
+        if ((content==null || content.isBlank())&&(quote==null || quote.isBlank())) {
+            throw new RuntimeException("Note cannot be empty");
         }
         Reading reading=readingService.getReadingById(readingId);
         Note note=new Note();
         note.setContent(content);
+        note.setQuote(quote);
         note.setReading(reading);
         return noteRepository.save(note);
     }
@@ -30,9 +31,9 @@ public class NoteService {
         Reading reading=readingService.getReadingById(readingId);
         return noteRepository.findByReading(reading);
     }
-    public Note updateNote(UUID readingId,UUID noteId, String content) {
-        if (content==null || content.isBlank()) {
-            throw new RuntimeException("Content is required");
+    public Note updateNote(UUID readingId,UUID noteId, String content, String quote) {
+        if ((content==null || content.isBlank())&&(quote==null || quote.isBlank())) {
+            deleteNote(readingId,noteId);
         }
         readingService.getReadingById(readingId);
         Note note=noteRepository.findById(noteId).
