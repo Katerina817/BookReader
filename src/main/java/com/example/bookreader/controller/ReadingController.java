@@ -29,7 +29,8 @@ public class ReadingController {
          Reading reading= readingService.createReading(
                  request.getBookId(),
                  request.getReadingStatus(),
-                 request.getDateStartOfReading());
+                 request.getDateStartOfReading(),
+                 request.getPrivateReading());
          return ReadingMapper.toReadingResponse(reading);
     }
 
@@ -54,7 +55,8 @@ public class ReadingController {
                 request.getEvaluationOfEmotions(),
                 request.getQualityOfDialog(),
                 request.getAtmosphere(),
-                request.getReview()
+                request.getReview(),
+                request.getPrivateReading()
         );
         return ReadingMapper.toReadingResponse(reading);
     }

@@ -54,6 +54,9 @@ public class Reading {
     @Column(columnDefinition = "text")
     private String review;
 
+    @Column(nullable = false)
+    private Boolean privateReading=false;
+
     @OneToMany(
             mappedBy = "reading",
             cascade = CascadeType.ALL,
@@ -167,4 +170,12 @@ public class Reading {
     public void setNotes(List<Note> notes) {
         this.notes = notes;
     }
+    public Boolean getPrivateReading() {
+        return privateReading;
+    }
+
+    public void setPrivateReading(Boolean privateReading) {
+        this.privateReading = privateReading;
+    }
+
 }

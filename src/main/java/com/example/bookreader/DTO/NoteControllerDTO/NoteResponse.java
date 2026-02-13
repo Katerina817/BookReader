@@ -11,4 +11,6 @@ public class NoteResponse {
     private String quote;
     private LocalDateTime dateOfCreation;
     private UUID readingId;
+    private Boolean privateNote;
+
 }

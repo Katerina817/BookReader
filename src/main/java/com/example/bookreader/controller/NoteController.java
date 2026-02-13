@@ -28,7 +28,11 @@ public class NoteController {
     public NoteResponse createNote(
             @PathVariable UUID readingId,
             @RequestBody @Valid CreateNoteRequest request) {
-        Note note = noteService.createNote(readingId, request.getContent(),request.getQuote());
+        Note note = noteService.createNote(
+                readingId,
+                request.getContent(),
+                request.getQuote(),
+                request.getPrivateNote());
         return NoteMapper.toResponse(note);
     }
 
@@ -46,13 +50,18 @@ public class NoteController {
             @PathVariable UUID readingId,
             @PathVariable UUID noteId,
             @RequestBody @Valid UpdateNoteRequest request){
-        Note note=noteService.updateNote(readingId,noteId,request.getContent(),request.getQuote());
+        Note note=noteService.updateNote(
+                readingId,
+                noteId,
+                request.getContent(),
+                request.getQuote(),
+                request.getPrivateNote());
         return NoteMapper.toResponse(note);
     }
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping
-    public List<NoteResponse> getAllNotes(
+    public List<NoteResponse> getAllNotesByReading(
             @PathVariable UUID readingId
     ){
         List<Note>notes=noteService.getNotesByReading(readingId);

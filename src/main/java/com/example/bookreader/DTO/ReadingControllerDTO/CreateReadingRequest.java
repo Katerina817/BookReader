@@ -18,4 +18,5 @@ public class CreateReadingRequest {
     private LocalDateTime dateStartOfReading;
     @NotNull
     private UUID bookId;
+    private Boolean privateReading;
 }

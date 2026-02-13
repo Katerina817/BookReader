@@ -22,20 +22,44 @@ public class ReadingService {
         this.userService = userService;
         this.bookService = bookService;
     }
-    public Reading getReadingById(UUID readingId) {
+    public Reading getReadingForOwner(UUID readingId) {
         User user=getCurrentUser();
-        Reading reading = readingRepository.findById(readingId)
-                .orElseThrow(()->new RuntimeException("Reading not found"));
+        Reading reading = getReadingEntity(readingId);
         if(!reading.getUser().getId().equals(user.getId())){
             throw new RuntimeException("Reading user id not match");
         }
         return reading;
     }
+    public Reading getReadingForViewer(UUID readingId) {
+        User viewer=getCurrentUser();
+        Reading reading = getReadingEntity(readingId);
+
+        if(reading.getPrivateReading()){
+            if(!reading.getUser().getId().equals(viewer.getId())){
+                throw new RuntimeException("Access denied");
+            }
+        }
+        return reading;
+    }
+    public Reading getReadingEntity(UUID readingId) {
+        return readingRepository.findById(readingId)
+                .orElseThrow(()->new RuntimeException("Reading not found"));
+    }
     public List<Reading> getAllReadingsByUser() {
         User user=getCurrentUser();
-        return readingRepository.findByUser(user);
+        return getUserReadingsForViewer(user.getId());
     }
-    public Reading createReading(UUID bookId,ReadingStatus readingStatus,LocalDateTime dateStartOfReading) {
+    public List<Reading> getUserReadingsForViewer(UUID ownerId) {
+        User viewer=getCurrentUser();
+        User owner=userService.getUserById(ownerId);
+        if(viewer.getId().equals(owner.getId())){
+            return readingRepository.findByUser(owner);
+        }
+        else{
+            return readingRepository.findByUserAndPrivateReadingFalse(owner);
+        }
+    }
+    public Reading createReading(UUID bookId,ReadingStatus readingStatus,LocalDateTime dateStartOfReading, Boolean privateReading) {
         User user=getCurrentUser();
         Book book=bookService.getBookById(bookId);
         if(readingRepository.existsReadingByUserAndBook(user,book)){
@@ -45,6 +69,11 @@ public class ReadingService {
         reading.setUser(user);
         reading.setBook(book);
         reading.setStatus(readingStatus);
+        if (book.isPrivate()==Boolean.TRUE){
+            reading.setPrivateReading(true);
+        }else{
+            reading.setPrivateReading(privateReading);
+        }
         if(dateStartOfReading!=null){
             reading.setDateStartOfReading(dateStartOfReading);
         }else if(readingStatus == ReadingStatus.READING){
@@ -52,8 +81,14 @@ public class ReadingService {
         }
         return readingRepository.save(reading);
     }
-    public Reading updateReading(UUID readingId, ReadingStatus newStatus, LocalDateTime dateStartOfReading, LocalDateTime dateEndOfReading,Integer evaluationOfCharacter, Integer evaluationOfPlot, Integer evaluationOfEmotions,Integer qualityOfDialog, Integer atmosphere, String review) {
-       Reading reading=getReadingById(readingId);
+    public Reading updateReading(UUID readingId, ReadingStatus newStatus, LocalDateTime dateStartOfReading, LocalDateTime dateEndOfReading,Integer evaluationOfCharacter, Integer evaluationOfPlot, Integer evaluationOfEmotions,Integer qualityOfDialog, Integer atmosphere, String review, Boolean privateReading) {
+       Reading reading=getReadingForOwner(readingId);
+       Book book=bookService.getBookById(reading.getBook().getId());
+        if (book.isPrivate()==Boolean.TRUE){
+            reading.setPrivateReading(true);
+        }else if (privateReading!=null){
+            reading.setPrivateReading(privateReading);
+        }
        if(newStatus!=null){
            reading.setStatus(newStatus);
            if(newStatus==ReadingStatus.READING)reading.setDateStartOfReading(LocalDateTime.now());
@@ -86,7 +121,7 @@ public class ReadingService {
        return readingRepository.save(reading);
     }
     public void deleteReading(UUID readingId) {
-        Reading reading=getReadingById(readingId);
+        Reading reading=getReadingForOwner(readingId);
         readingRepository.delete(reading);
     }
     private boolean isRatingAllowed(Reading reading, ReadingStatus newStatus) {

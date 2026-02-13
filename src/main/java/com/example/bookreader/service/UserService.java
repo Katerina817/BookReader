@@ -5,6 +5,8 @@ import com.example.bookreader.repository.UserRepository;
 import com.example.bookreader.security.SecurityUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -17,6 +19,10 @@ public class UserService {
     public User getCurrentUser() {
         String login= securityUtils.getCurrentUser().getLogin();
         return userRepository.findByLogin(login)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+    public User getUserById(UUID id) {
+        return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

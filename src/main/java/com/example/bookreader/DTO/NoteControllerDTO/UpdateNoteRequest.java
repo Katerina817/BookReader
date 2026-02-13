@@ -9,4 +9,6 @@ public class UpdateNoteRequest {
     private String content;
 
     private String quote;
+
+    private Boolean privateNote;
 }

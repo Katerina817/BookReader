@@ -27,6 +27,9 @@ public class Note {
     @JoinColumn(name = "reading_id", nullable = false)
     private Reading reading;
 
+    @Column(nullable = false)
+    private Boolean privateNote=false;
+
     public Note() {
     }
 
@@ -64,7 +67,13 @@ public class Note {
     public String getQuote() {
         return quote;
     }
+    public Boolean getPrivateNote() {
+        return privateNote;
+    }
 
+    public void setPrivateNote(Boolean privateNote) {
+        this.privateNote = privateNote;
+    }
     public void setQuote(String quote) {
         this.quote = quote;
     }

@@ -27,8 +27,8 @@ public class Book {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false, name = "isPrivate")
-    private Boolean isPrivate;
+    @Column(nullable = false)
+    private Boolean isPrivate=false;
 
     public Book() {}
 

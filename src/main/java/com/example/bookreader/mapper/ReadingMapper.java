@@ -12,6 +12,7 @@ public class ReadingMapper {
         dto.setUserId(reading.getUser().getId());
         dto.setBookId(reading.getBook().getId());
         dto.setId(reading.getId());
+        dto.setPrivateReading(reading.getPrivateReading());
         dto.setEvaluationOfCharacter(reading.getEvaluationOfCharacter());
         dto.setEvaluationOfPlot(reading.getEvaluationOfPlot());
         dto.setEvaluationOfEmotions(reading.getEvaluationOfEmotions());

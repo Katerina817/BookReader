@@ -16,4 +16,5 @@ public class UpdateReadingRequest {
     private Integer qualityOfDialog;
     private Integer atmosphere;
     private String review;
+    private Boolean privateReading;
 }
