@@ -38,18 +38,24 @@ public class NoteService {
     }
     public List<Note> getNotesByReading(UUID readingId) {
         User viewer=getCurrentUser();
-        Reading reading=readingService.getReadingForOwner(readingId);
+        Reading reading=readingService.getReadingForViewer(readingId);
         User owner=reading.getUser();
-        if(viewer.getId().equals(owner.getId())){
+        //чтение приватное и viewer не владелец - нет доступа
+        if(!readingService.canViewReading(reading,viewer)){
+            throw new RuntimeException("Access denied");
+        }
+        //если viewer владелец - видит все заметки
+        if(viewer.getId().equals(owner.getId())) {
             return noteRepository.findByReading(reading);
         }
-        else{
-            return noteRepository.findByReadingAndPrivateReadingFalse(reading);
-        }
+        //сюда вставить друзей, только друзья могут видеть заметки кроме самого владельца!!!
+        //если viewer не владелец и чтение не приватное - видит только открытые заметки
+        return noteRepository.findByReadingAndPrivateNoteFalse(reading);
     }
     public Note updateNote(UUID readingId,UUID noteId, String content, String quote,Boolean privateReading) {
         if ((content==null || content.isBlank())&&(quote==null || quote.isBlank())) {
             deleteNote(readingId,noteId);
+            return null;
         }
         Reading reading=readingService.getReadingForOwner(readingId);
         Note note=noteRepository.findById(noteId).

@@ -1,17 +1,19 @@
 package com.example.bookreader.mapper;
 
-import com.example.bookreader.DTO.ReadingControllerDTO.ReadingResponse;
+import com.example.bookreader.DTO.ReadingControllerDTO.ReadingOwnerResponse;
+import com.example.bookreader.DTO.ReadingControllerDTO.ReadingViewerResponse;
 import com.example.bookreader.entity.Reading;
 
 public class ReadingMapper {
-    public static ReadingResponse toReadingResponse(Reading reading) {
-        ReadingResponse dto = new ReadingResponse();
+    public static ReadingOwnerResponse toReadingOwnerResponse(Reading reading) {
+        ReadingOwnerResponse dto = new ReadingOwnerResponse();
         dto.setReadingStatus(reading.getStatus());
         dto.setDateStartOfReading(reading.getDateStartOfReading());
         dto.setDateFinishOfReading(reading.getDateFinishOfReading());
-        dto.setUserId(reading.getUser().getId());
         dto.setBookId(reading.getBook().getId());
         dto.setId(reading.getId());
+        dto.setName(reading.getBook().getName());
+        dto.setAuthor(reading.getBook().getAuthor());
         dto.setPrivateReading(reading.getPrivateReading());
         dto.setEvaluationOfCharacter(reading.getEvaluationOfCharacter());
         dto.setEvaluationOfPlot(reading.getEvaluationOfPlot());
@@ -23,6 +25,15 @@ public class ReadingMapper {
                 .stream()
                 .map(NoteMapper::toResponse)
                 .toList());
+        return dto;
+    }
+    public static ReadingViewerResponse toReadingViewerResponse(Reading reading) {
+        ReadingViewerResponse dto = new ReadingViewerResponse();
+        dto.setId(reading.getId());
+        dto.setReadingStatus(reading.getStatus());
+        dto.setBookId(reading.getBook().getId());
+        dto.setAuthor(reading.getBook().getAuthor());
+        dto.setName(reading.getBook().getName());
         return dto;
     }
 }

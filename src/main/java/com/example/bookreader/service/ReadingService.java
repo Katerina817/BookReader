@@ -33,18 +33,16 @@ public class ReadingService {
     public Reading getReadingForViewer(UUID readingId) {
         User viewer=getCurrentUser();
         Reading reading = getReadingEntity(readingId);
-
-        if(reading.getPrivateReading()){
-            if(!reading.getUser().getId().equals(viewer.getId())){
-                throw new RuntimeException("Access denied");
-            }
+        if(!canViewReading(reading,viewer)){
+            throw new RuntimeException("Access denied");
         }
         return reading;
     }
-    public Reading getReadingEntity(UUID readingId) {
+    private Reading getReadingEntity(UUID readingId) {
         return readingRepository.findById(readingId)
                 .orElseThrow(()->new RuntimeException("Reading not found"));
     }
+
     public List<Reading> getAllReadingsByUser() {
         User user=getCurrentUser();
         return getUserReadingsForViewer(user.getId());
@@ -130,5 +128,18 @@ public class ReadingService {
     }
     private User getCurrentUser() {
         return userService.getCurrentUser();
+    }
+
+    public boolean canViewReading(Reading reading, User viewer) {
+        //если viewer - владелец reading
+        if(viewer.getId().equals(reading.getUser().getId())) {
+            return true;
+        }
+        //если reading публичный, могут смотреть все
+        if(!reading.getPrivateReading()){
+            return true;
+        }
+        //сюда еще друзей добавить надо позже!!!
+        return false;
     }
 }

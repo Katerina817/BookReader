@@ -1,7 +1,8 @@
 package com.example.bookreader.controller;
 
 import com.example.bookreader.DTO.ReadingControllerDTO.CreateReadingRequest;
-import com.example.bookreader.DTO.ReadingControllerDTO.ReadingResponse;
+import com.example.bookreader.DTO.ReadingControllerDTO.ReadingOwnerResponse;
+import com.example.bookreader.DTO.ReadingControllerDTO.ReadingViewerResponse;
 import com.example.bookreader.DTO.ReadingControllerDTO.UpdateReadingRequest;
 import com.example.bookreader.entity.Reading;
 import com.example.bookreader.mapper.ReadingMapper;
@@ -25,13 +26,13 @@ public class ReadingController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping
-    public ReadingResponse createReading(@RequestBody @Valid CreateReadingRequest request) {
+    public ReadingOwnerResponse createReading(@RequestBody @Valid CreateReadingRequest request) {
          Reading reading= readingService.createReading(
                  request.getBookId(),
                  request.getReadingStatus(),
                  request.getDateStartOfReading(),
                  request.getPrivateReading());
-         return ReadingMapper.toReadingResponse(reading);
+         return ReadingMapper.toReadingOwnerResponse(reading);
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -42,7 +43,7 @@ public class ReadingController {
 
     @PreAuthorize("hasRole('USER')")
     @PatchMapping("/{id}")
-    public ReadingResponse updateReading(
+    public ReadingOwnerResponse updateReading(
             @PathVariable UUID id,
             @RequestBody UpdateReadingRequest request) {
         Reading reading = readingService.updateReading(
@@ -58,15 +59,25 @@ public class ReadingController {
                 request.getReview(),
                 request.getPrivateReading()
         );
-        return ReadingMapper.toReadingResponse(reading);
+        return ReadingMapper.toReadingOwnerResponse(reading);
     }
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping
-    public List<ReadingResponse> getAllReadingsByUser() {
+    public List<ReadingOwnerResponse> getMyReadings() {
         return readingService.getAllReadingsByUser()
                 .stream()
-                .map(ReadingMapper::toReadingResponse)
+                .map(ReadingMapper::toReadingOwnerResponse)
                 .collect(Collectors.toList());
     }
+    @GetMapping("/users/{userId}")
+    public List<ReadingViewerResponse> getUserReadings(
+            @PathVariable UUID userId
+    ) {
+        return readingService.getUserReadingsForViewer(userId)
+                .stream()
+                .map(ReadingMapper::toReadingViewerResponse)
+                .collect(Collectors.toList());
+    }
+
 }

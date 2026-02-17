@@ -12,5 +12,5 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
 
     List<Note> findByReading(Reading reading);
 
-    List<Note> findByReadingAndPrivateReadingFalse(Reading reading);
+    List<Note> findByReadingAndPrivateNoteFalse(Reading reading);
 }

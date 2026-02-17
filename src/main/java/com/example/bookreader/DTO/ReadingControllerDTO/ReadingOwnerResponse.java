@@ -9,13 +9,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 @Data
-public class ReadingResponse {
+public class ReadingOwnerResponse {
     private UUID id;
     private ReadingStatus readingStatus;
     private LocalDateTime dateStartOfReading;
     private LocalDateTime dateFinishOfReading;
-    private UUID userId;
+
     private UUID bookId;
+    private String name;
+    private String author;
+
     private Integer evaluationOfCharacter;
     private Integer evaluationOfPlot;
     private Integer evaluationOfEmotions;
@@ -25,3 +28,4 @@ public class ReadingResponse {
     private Boolean privateReading;
     private List<NoteResponse> notes;
 }
+
