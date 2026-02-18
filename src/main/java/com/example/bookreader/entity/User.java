@@ -16,25 +16,23 @@ import java.util.UUID;
 @Getter
 @Table(name = "users")
 public class User implements UserDetails {
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Getter
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Getter
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false,unique = true,length = 50)
     private String login;
 
-    @Getter
     @Column(unique = true,length = 150)
     private String email;
+
+    private Boolean privateFriends=false;
 
     public User(){
         setRole(Role.USER);

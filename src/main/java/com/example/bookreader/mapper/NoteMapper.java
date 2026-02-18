@@ -10,7 +10,7 @@ public class NoteMapper {
         response.setContent(note.getContent());
         response.setReadingId(note.getReading().getId());
         response.setQuote(note.getQuote());
-        response.setPrivateReading(note.getPrivateNote());
+        response.setPrivateNote(note.getPrivateNote());
         response.setDateOfCreation(note.getDateOfCreation());
         return response;
     }
