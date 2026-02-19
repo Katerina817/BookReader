@@ -14,13 +14,15 @@ public class NoteService {
     private final NoteRepository noteRepository;
     private final ReadingService readingService;
     private final UserService userService;
+    private final FriendshipService friendshipService;
 
-    public NoteService(NoteRepository noteRepository, ReadingService readingService,UserService userService) {
+    public NoteService(NoteRepository noteRepository, ReadingService readingService, UserService userService, FriendshipService friendshipService) {
         this.noteRepository = noteRepository;
         this.readingService = readingService;
         this.userService = userService;
+        this.friendshipService = friendshipService;
     }
-    public Note createNote(UUID readingId, String content, String quote,Boolean privateReading) {
+    public Note createNote(UUID readingId, String content, String quote,Boolean privateNote) {
         if ((content==null || content.isBlank())&&(quote==null || quote.isBlank())) {
             throw new RuntimeException("Note cannot be empty");
         }
@@ -31,31 +33,30 @@ public class NoteService {
         if (reading.getPrivateReading()==Boolean.TRUE){
             note.setPrivateNote(true);
         }else{
-            note.setPrivateNote(privateReading);
+            note.setPrivateNote(privateNote);
         }
         note.setReading(reading);
         return noteRepository.save(note);
     }
     public List<Note> getNotesByReading(UUID readingId) {
         User viewer=getCurrentUser();
+        //чтение приватное и viewer не владелец - нет доступа
         Reading reading=readingService.getReadingForViewer(readingId);
         User owner=reading.getUser();
-        //чтение приватное и viewer не владелец - нет доступа
-        if(!readingService.canViewReading(reading,viewer)){
-            throw new RuntimeException("Access denied");
-        }
         //если viewer владелец - видит все заметки
         if(viewer.getId().equals(owner.getId())) {
             return noteRepository.findByReading(reading);
         }
-        //сюда вставить друзей, только друзья могут видеть заметки кроме самого владельца!!!
-        //если viewer не владелец и чтение не приватное - видит только открытые заметки
+        if(!friendshipService.existsFriendship(viewer,owner)){
+            throw new RuntimeException("Access denied");
+        }
+        //только друзья могут видеть заметки кроме самого владельца!!!
         return noteRepository.findByReadingAndPrivateNoteFalse(reading);
     }
-    public Note updateNote(UUID readingId,UUID noteId, String content, String quote,Boolean privateReading) {
+    public Note updateNote(UUID readingId,UUID noteId, String content, String quote,Boolean privateNote) {
         if ((content==null || content.isBlank())&&(quote==null || quote.isBlank())) {
             deleteNote(readingId,noteId);
-            return null;
+            throw new RuntimeException("Note cannot be empty");
         }
         Reading reading=readingService.getReadingForOwner(readingId);
         Note note=noteRepository.findById(noteId).
@@ -65,8 +66,8 @@ public class NoteService {
         }
         if (reading.getPrivateReading()==Boolean.TRUE){
             note.setPrivateNote(true);
-        }else if(privateReading!=null){
-            note.setPrivateNote(privateReading);
+        }else if(privateNote!=null){
+            note.setPrivateNote(privateNote);
         }
         note.setContent(content);
         note.setQuote(quote);

@@ -1,24 +1,15 @@
-package com.example.bookreader.DTO.ReadingControllerDTO;
+package com.example.bookreader.DTO.ReadingControllerDTO.Response;
 
 
-import com.example.bookreader.DTO.NoteControllerDTO.NoteResponse;
-import com.example.bookreader.entity.ReadingStatus;
+import com.example.bookreader.DTO.NoteControllerDTO.Response.NoteResponse;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 @Data
-public class ReadingOwnerResponse {
-    private UUID id;
-    private ReadingStatus readingStatus;
+public class ReadingOwnerResponse extends BaseReadingResponse {
     private LocalDateTime dateStartOfReading;
     private LocalDateTime dateFinishOfReading;
-
-    private UUID bookId;
-    private String name;
-    private String author;
-
     private Integer evaluationOfCharacter;
     private Integer evaluationOfPlot;
     private Integer evaluationOfEmotions;

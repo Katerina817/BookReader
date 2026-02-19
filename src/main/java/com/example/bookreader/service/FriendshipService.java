@@ -109,4 +109,8 @@ public class FriendshipService {
         dto.setCreatedAt(friendship.getCreatedAt());
         return dto;
     }
+
+    public Boolean existsFriendship(User user1, User user2) {
+        return friendshipRepository.existsBetweenUsers(user1,user2);
+    }
 }

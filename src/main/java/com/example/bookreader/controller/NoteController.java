@@ -1,11 +1,14 @@
 package com.example.bookreader.controller;
 
+import com.example.bookreader.DTO.NoteControllerDTO.Response.BaseNoteResponse;
 import com.example.bookreader.DTO.NoteControllerDTO.CreateNoteRequest;
-import com.example.bookreader.DTO.NoteControllerDTO.NoteResponse;
+import com.example.bookreader.DTO.NoteControllerDTO.Response.NoteResponse;
 import com.example.bookreader.DTO.NoteControllerDTO.UpdateNoteRequest;
+import com.example.bookreader.entity.User;
 import com.example.bookreader.mapper.NoteMapper;
 import com.example.bookreader.entity.Note;
 import com.example.bookreader.service.NoteService;
+import com.example.bookreader.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +21,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/readings/{readingId}/notes")
 public class NoteController {
     private final NoteService noteService;
+    private final UserService userService;
 
-    public NoteController(NoteService noteService) {
+    public NoteController(NoteService noteService, UserService userService) {
         this.noteService = noteService;
+        this.userService = userService;
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -61,12 +66,18 @@ public class NoteController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping
-    public List<NoteResponse> getAllNotesByReading(
+    public List<? extends BaseNoteResponse> getAllNotesByReading(
             @PathVariable UUID readingId
     ){
-        List<Note>notes=noteService.getNotesByReading(readingId);
-        return notes.stream()
-                .map(NoteMapper::toResponse)
+        User viewer=userService.getCurrentUser();
+
+        return noteService.getNotesByReading(readingId).stream()
+                .map(note -> {
+                    if(note.getReading().getUser().getId().equals(viewer.getId())){
+                        return NoteMapper.toResponse(note);
+                    }
+                    return NoteMapper.toResponseForFriend(note);
+                })
                 .collect(Collectors.toList());
     }
 }

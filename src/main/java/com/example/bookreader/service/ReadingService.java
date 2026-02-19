@@ -16,11 +16,13 @@ public class ReadingService {
     private final ReadingRepository readingRepository;
     private final UserService userService;
     private final BookService bookService;
+    private final FriendshipService friendshipService;
 
-    public ReadingService(ReadingRepository readingRepository, UserService userService, BookService bookService) {
+    public ReadingService(ReadingRepository readingRepository, UserService userService, BookService bookService, FriendshipService friendshipService) {
         this.readingRepository = readingRepository;
         this.userService = userService;
         this.bookService = bookService;
+        this.friendshipService = friendshipService;
     }
     public Reading getReadingForOwner(UUID readingId) {
         User user=getCurrentUser();
@@ -45,17 +47,15 @@ public class ReadingService {
 
     public List<Reading> getAllReadingsByUser() {
         User user=getCurrentUser();
-        return getUserReadingsForViewer(user.getId());
+        return getUserReadings(user.getId());
     }
-    public List<Reading> getUserReadingsForViewer(UUID ownerId) {
+    public List<Reading> getUserReadings(UUID ownerId) {
         User viewer=getCurrentUser();
         User owner=userService.getUserById(ownerId);
         if(viewer.getId().equals(owner.getId())){
             return readingRepository.findByUser(owner);
         }
-        else{
-            return readingRepository.findByUserAndPrivateReadingFalse(owner);
-        }
+        return readingRepository.findByUserAndPrivateReadingFalse(owner);
     }
     public Reading createReading(UUID bookId,ReadingStatus readingStatus,LocalDateTime dateStartOfReading, Boolean privateReading) {
         User user=getCurrentUser();
@@ -131,15 +131,12 @@ public class ReadingService {
     }
 
     public boolean canViewReading(Reading reading, User viewer) {
+        User owner=reading.getUser();
         //если viewer - владелец reading
-        if(viewer.getId().equals(reading.getUser().getId())) {
+        if(viewer.getId().equals(owner.getId())) {
             return true;
         }
         //если reading публичный, могут смотреть все
-        if(!reading.getPrivateReading()){
-            return true;
-        }
-        //сюда еще друзей добавить надо позже!!!
-        return false;
+        return !reading.getPrivateReading();
     }
 }

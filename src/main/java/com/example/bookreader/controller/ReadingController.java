@@ -1,12 +1,14 @@
 package com.example.bookreader.controller;
 
-import com.example.bookreader.DTO.ReadingControllerDTO.CreateReadingRequest;
-import com.example.bookreader.DTO.ReadingControllerDTO.ReadingOwnerResponse;
-import com.example.bookreader.DTO.ReadingControllerDTO.ReadingViewerResponse;
-import com.example.bookreader.DTO.ReadingControllerDTO.UpdateReadingRequest;
+import com.example.bookreader.DTO.ReadingControllerDTO.*;
+import com.example.bookreader.DTO.ReadingControllerDTO.Response.BaseReadingResponse;
+import com.example.bookreader.DTO.ReadingControllerDTO.Response.ReadingOwnerResponse;
 import com.example.bookreader.entity.Reading;
+import com.example.bookreader.entity.User;
 import com.example.bookreader.mapper.ReadingMapper;
+import com.example.bookreader.service.FriendshipService;
 import com.example.bookreader.service.ReadingService;
+import com.example.bookreader.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +21,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/readings")
 public class ReadingController {
     private final ReadingService readingService;
+    private final UserService userService;
+    private final FriendshipService friendshipService;
 
-    public ReadingController(ReadingService readingService) {
+    public ReadingController(ReadingService readingService, UserService userService, FriendshipService friendshipService) {
         this.readingService = readingService;
+        this.userService = userService;
+        this.friendshipService = friendshipService;
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -71,13 +77,22 @@ public class ReadingController {
                 .collect(Collectors.toList());
     }
     @GetMapping("/users/{userId}")
-    public List<ReadingViewerResponse> getUserReadings(
+    public List<? extends BaseReadingResponse> getUserReadings(
             @PathVariable UUID userId
     ) {
-        return readingService.getUserReadingsForViewer(userId)
+        User viewer=userService.getCurrentUser();
+
+        return readingService.getUserReadings(userId)
                 .stream()
-                .map(ReadingMapper::toReadingViewerResponse)
+                .map(reading -> {
+                    if(reading.getUser().getId().equals(viewer.getId())) {
+                        return ReadingMapper.toReadingOwnerResponse(reading);
+                    }
+                    if(friendshipService.existsFriendship(reading.getUser(), viewer)) {
+                        return ReadingMapper.toReadingFriendResponse(reading);
+                    }
+                    return ReadingMapper.toReadingViewerResponse(reading);
+                })
                 .collect(Collectors.toList());
     }
-
 }
