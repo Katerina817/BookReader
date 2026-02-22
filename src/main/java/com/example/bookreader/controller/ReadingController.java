@@ -69,15 +69,15 @@ public class ReadingController {
         return ReadingMapper.toReadingOwnerResponse(reading);
     }
 
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/me")
+    /*@PreAuthorize("hasRole('USER')")
+    @GetMapping
     public List<? extends BaseReadingResponse> getMyReadings() {
         return readingService.getMyReadings();
-    }
-
+    }*/
+    @PreAuthorize("hasRole('USER')")
     @GetMapping
     public List<? extends BaseReadingResponse> getUserReadings(
-            @RequestParam UUID userId
+            @RequestParam(required = false) UUID userId
     ) {
         return readingService.getUserReadings(userId);
     }

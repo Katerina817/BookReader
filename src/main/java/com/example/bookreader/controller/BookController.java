@@ -5,8 +5,6 @@ import com.example.bookreader.DTO.BookControllerDTO.CreateBookRequest;
 import com.example.bookreader.DTO.BookControllerDTO.UpdateBookRequest;
 import com.example.bookreader.enums.SortDirection;
 import com.example.bookreader.enums.BookSortType;
-import com.example.bookreader.mapper.BookMapper;
-import com.example.bookreader.entity.Book;
 import com.example.bookreader.entity.Genre;
 import com.example.bookreader.service.BookService;
 import jakarta.validation.Valid;

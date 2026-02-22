@@ -50,22 +50,29 @@ public class BookService {
                     .filter(book -> book.getGenres().containsAll(genres))
                     .collect(Collectors.toList());
         }
-
+        List<BookResponse>responses=books.stream().map(this::getBookResponse).toList();
         //сортировка
         if(sortType!=null){
-            Comparator<Book> comparator = switch (sortType){
-                case NAME -> Comparator.comparing(Book::getName);
-                case AUTHOR -> Comparator.comparing(Book::getAuthor);
-            };
-
-            if(sortDirection== SortDirection.DESC){
-                comparator = comparator.reversed();
-            }
-            books=books.stream()
+            Comparator<BookResponse> comparator = getBookComparator(sortType, sortDirection);
+            responses=responses.stream()
                     .sorted(comparator)
                     .collect(Collectors.toList());
         }
-        return books.stream().map(this::getBookResponse).toList();
+        return responses;
+    }
+
+    private static Comparator<BookResponse> getBookComparator(BookSortType sortType, SortDirection sortDirection) {
+        Comparator<BookResponse> comparator = switch (sortType){
+            case NAME -> Comparator.comparing(BookResponse::getName);
+            case AUTHOR -> Comparator.comparing(BookResponse::getAuthor);
+            case MARK -> Comparator.comparing(BookResponse::getAverageMark,
+                    Comparator.nullsLast(Double::compareTo));
+        };
+
+        if(sortDirection == SortDirection.DESC){
+            comparator = comparator.reversed();
+        }
+        return comparator;
     }
 
     private BookResponse getBookResponse(Book book) {

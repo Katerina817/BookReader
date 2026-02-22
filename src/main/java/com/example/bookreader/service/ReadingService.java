@@ -51,10 +51,10 @@ public class ReadingService {
                 .orElseThrow(()->new RuntimeException("Reading not found"));
     }
 
-    public List<? extends BaseReadingResponse> getMyReadings() {
+    /*public List<? extends BaseReadingResponse> getMyReadings() {
         User user=getCurrentUser();
         return getUserReadings(user.getId());
-    }
+    }*/
     /*public List<Reading> getUserReadings(UUID ownerId) {
         User viewer=getCurrentUser();   //АНАЛОГИЧНО
         User owner=userService.getUserById(ownerId);
@@ -64,8 +64,12 @@ public class ReadingService {
         return readingRepository.findByUserAndPrivateReadingFalse(owner);
     }*/
     public List<? extends BaseReadingResponse> getUserReadings(UUID ownerId) {
-        User viewer=getCurrentUser();
-        User owner=userService.getUserById(ownerId);
+        User viewer=getCurrentUser(); User owner;
+        if(ownerId==null){
+            owner=getCurrentUser();
+        }else {
+            owner=userService.getUserById(ownerId);
+        }
         //если тот кто просматривает и есть владелец reading
         if(viewer.getId().equals(owner.getId())){
             return readingRepository.findByUser(owner).
