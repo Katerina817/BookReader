@@ -1,14 +1,20 @@
 package com.example.bookreader.service;
 
+import com.example.bookreader.DTO.BookControllerDTO.BookResponse;
+import com.example.bookreader.entity.Reading;
+import com.example.bookreader.enums.ReadingStatus;
+import com.example.bookreader.enums.SortDirection;
+import com.example.bookreader.enums.BookSortType;
 import com.example.bookreader.entity.Book;
 import com.example.bookreader.entity.Genre;
 import com.example.bookreader.entity.User;
+import com.example.bookreader.mapper.BookMapper;
 import com.example.bookreader.repository.BookRepository;
+import lombok.Locked;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -20,15 +26,73 @@ public class BookService {
         this.genreService = genreService;
         this.userService = userService;
     }
-    public List<Book> findByName(String name) {
-        return bookRepository.findByNameContainingIgnoreCase(getCurrentUser(), name);
+
+    public List<BookResponse> findBooks(String name, String author, List<UUID> genreIds, BookSortType sortType, SortDirection sortDirection) {
+        List<Book> books;
+        User user = getCurrentUser();
+        if(name!=null && author!=null){
+            books = bookRepository.findByNameContainingIgnoreCaseAndAuthorContainingIgnoreCase(user,name, author);
+        }
+        else if(name!=null){
+            books = bookRepository.findByNameContainingIgnoreCase(user, name);
+        }
+        else if(author!=null){
+            books = bookRepository.findByAuthorContainingIgnoreCase(user,author);
+        }
+        else{
+            books=bookRepository.findAllVisibleForUser(user);
+        }
+
+        if(genreIds!=null && !genreIds.isEmpty()){
+            Set<Genre> genres = genreService.getGenresByIds(genreIds);
+            books=books
+                    .stream()
+                    .filter(book -> book.getGenres().containsAll(genres))
+                    .collect(Collectors.toList());
+        }
+
+        //сортировка
+        if(sortType!=null){
+            Comparator<Book> comparator = switch (sortType){
+                case NAME -> Comparator.comparing(Book::getName);
+                case AUTHOR -> Comparator.comparing(Book::getAuthor);
+            };
+
+            if(sortDirection== SortDirection.DESC){
+                comparator = comparator.reversed();
+            }
+            books=books.stream()
+                    .sorted(comparator)
+                    .collect(Collectors.toList());
+        }
+        return books.stream().map(this::getBookResponse).toList();
     }
-    public List<Book> findByAuthor(String author) {
-        return bookRepository.findByAuthorContainingIgnoreCase(getCurrentUser(),author);
+
+    private BookResponse getBookResponse(Book book) {
+        List<Reading>publicReadings = book.getReadings()
+                .stream()
+                .filter(r->
+                        !r.getPrivateReading()
+                && (r.getStatus()== ReadingStatus.FINISHED ||r.getStatus()== ReadingStatus.DROPPED)
+                && r.getFinalMark()!=null)
+                .toList();
+        Double averageMark=publicReadings
+                .stream()
+                .mapToDouble(Reading::getFinalMark)
+                .average()
+                .orElse(0.0);
+        List<String>reviews=publicReadings
+                .stream()
+                .map(Reading::getReview)
+                .filter(Objects::nonNull)
+                .toList();
+        return BookMapper.toResponse(
+                book,
+                averageMark,
+                reviews,
+                publicReadings.size());
     }
-    public List<Book> findByNameAndAuthor(String name, String author) {
-        return bookRepository.findByNameContainingIgnoreCaseAndAuthorContainingIgnoreCase(getCurrentUser(),name, author);
-    }
+
     public Book getBookById(UUID id) {
         User user=getCurrentUser();
         Book book=bookRepository.findById(id)
@@ -44,7 +108,7 @@ public class BookService {
         Book book=getBookById(bookId);
         bookRepository.delete(book);
     }
-    public Book updateBook(UUID id,String name, String author, String description, Boolean isPrivate) {
+    public BookResponse updateBook(UUID id,String name, String author, String description, Boolean isPrivate) {
         Book book=getBookById(id);
         if(name!=null) book.setName(name);
         if(author!=null) book.setAuthor(author);
@@ -64,9 +128,10 @@ public class BookService {
                 throw new RuntimeException("Book already exists");
             }
         };
-        return bookRepository.save(book);
+        bookRepository.save(book);
+        return getBookResponse(book);
     }
-    public Book addBook(String name, String author, String description, Boolean isPrivate) {
+    public BookResponse addBook(String name, String author, String description, Boolean isPrivate) {
         Book book=new Book();
         if (name == null || name.isBlank()) {
             throw new RuntimeException("Book name is required");
@@ -84,25 +149,28 @@ public class BookService {
         if (isPrivate!=null && isPrivate) {
             book.setUser(getCurrentUser());
         }
-        return bookRepository.save(book);
+        bookRepository.save(book);
+        return getBookResponse(book);
     }
-    public Book addGenreToBook(UUID bookId, UUID genreId) {
+    public BookResponse addGenreToBook(UUID bookId, UUID genreId) {
         Book book=getBookById(bookId);
         Genre genre=genreService.getGenreById(genreId);
         if(book.getGenres().contains(genre)) {
             throw new RuntimeException("Genre already exists");
         }
         book.getGenres().add(genre);
-        return bookRepository.save(book);
+        bookRepository.save(book);
+        return getBookResponse(book);
     }
-    public Book deleteGenreFromBook(UUID bookId, UUID genreId) {
+    public BookResponse deleteGenreFromBook(UUID bookId, UUID genreId) {
         Book book=getBookById(bookId);
         Genre genre=genreService.getGenreById(genreId);
         if(!book.getGenres().contains(genre)) {
             throw new RuntimeException("Genre not assigned to this book");
         }
         book.getGenres().remove(genre);
-        return bookRepository.save(book);
+        bookRepository.save(book);
+        return getBookResponse(book);
     }
     public Set<Genre> getBookGenres(UUID bookId) {
         return getBookById(bookId).getGenres();

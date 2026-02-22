@@ -2,10 +2,9 @@ package com.example.bookreader.repository;
 
 import com.example.bookreader.entity.Book;
 import com.example.bookreader.entity.Reading;
-import com.example.bookreader.entity.ReadingStatus;
+import com.example.bookreader.enums.ReadingStatus;
 import com.example.bookreader.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,4 +21,6 @@ public interface ReadingRepository extends JpaRepository<Reading, UUID> {
     boolean existsReadingByUserAndBook(User user, Book book);
 
     List<Reading> findByUserAndPrivateReadingFalse(User user);
+
+    List<Reading> findByBookAndPrivateReadingFalse(Book book);
 }

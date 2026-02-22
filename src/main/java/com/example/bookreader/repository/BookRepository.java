@@ -44,4 +44,11 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
             @Param("name")String name,
             @Param("author")String author
     );
+    @Query("""
+    SELECT b FROM Book b
+    WHERE (b.isPrivate=false OR b.user=:user)
+    """)
+    List<Book> findAllVisibleForUser(
+            @Param("user")User user
+    );
 }

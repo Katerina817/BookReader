@@ -1,5 +1,8 @@
 package com.example.bookreader.DTO.BookControllerDTO;
 
+import lombok.Data;
+
+@Data
 public class UpdateBookRequest {
     private String name;
 
@@ -9,35 +12,4 @@ public class UpdateBookRequest {
 
     private Boolean isPrivate;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Boolean getPrivate() {
-        return isPrivate;
-    }
-
-    public void setPrivate(Boolean aPrivate) {
-        isPrivate = aPrivate;
-    }
 }

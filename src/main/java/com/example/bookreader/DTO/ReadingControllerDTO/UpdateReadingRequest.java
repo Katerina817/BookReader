@@ -1,6 +1,6 @@
 package com.example.bookreader.DTO.ReadingControllerDTO;
 
-import com.example.bookreader.entity.ReadingStatus;
+import com.example.bookreader.enums.ReadingStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;

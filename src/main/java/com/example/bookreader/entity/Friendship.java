@@ -1,5 +1,6 @@
 package com.example.bookreader.entity;
 
+import com.example.bookreader.enums.FriendshipStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

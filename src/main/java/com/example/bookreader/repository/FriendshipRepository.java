@@ -1,7 +1,7 @@
 package com.example.bookreader.repository;
 
 import com.example.bookreader.entity.Friendship;
-import com.example.bookreader.entity.FriendshipStatus;
+import com.example.bookreader.enums.FriendshipStatus;
 import com.example.bookreader.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

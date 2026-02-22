@@ -1,4 +1,4 @@
-package com.example.bookreader.entity;
+package com.example.bookreader.enums;
 
 public enum ReadingStatus {
     PLAN, READING, FINISHED, DROPPED

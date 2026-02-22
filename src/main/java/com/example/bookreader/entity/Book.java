@@ -2,9 +2,7 @@ package com.example.bookreader.entity;
 
 import jakarta.persistence.*;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "books")
@@ -29,6 +27,13 @@ public class Book {
 
     @Column(nullable = false)
     private Boolean isPrivate=false;
+
+    @OneToMany(
+            mappedBy = "book",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Reading> readings=new ArrayList<>();
 
     public Book() {}
 
@@ -91,5 +96,13 @@ public class Book {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Reading> getReadings() {
+        return readings;
+    }
+
+    public void setReadings(List<Reading> readings) {
+        this.readings = readings;
     }
 }

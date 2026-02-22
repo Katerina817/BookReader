@@ -1,5 +1,6 @@
 package com.example.bookreader.entity;
 
+import com.example.bookreader.enums.ReadingStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -50,6 +51,10 @@ public class Reading {
     @Column
     @Min(1)@Max(10)
     private Integer atmosphere;
+
+    @Column
+    @Min(1)@Max(10)
+    private Double finalMark;
 
     @Column(columnDefinition = "text")
     private String review;
@@ -165,6 +170,13 @@ public class Reading {
 
     public List<Note> getNotes() {
         return notes;
+    }
+    public Double getFinalMark() {
+        return finalMark;
+    }
+
+    public void setFinalMark(Double finalMark) {
+        this.finalMark = finalMark;
     }
 
     public void setNotes(List<Note> notes) {

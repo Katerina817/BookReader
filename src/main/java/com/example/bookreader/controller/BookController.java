@@ -3,6 +3,8 @@ package com.example.bookreader.controller;
 import com.example.bookreader.DTO.BookControllerDTO.BookResponse;
 import com.example.bookreader.DTO.BookControllerDTO.CreateBookRequest;
 import com.example.bookreader.DTO.BookControllerDTO.UpdateBookRequest;
+import com.example.bookreader.enums.SortDirection;
+import com.example.bookreader.enums.BookSortType;
 import com.example.bookreader.mapper.BookMapper;
 import com.example.bookreader.entity.Book;
 import com.example.bookreader.entity.Genre;
@@ -26,25 +28,25 @@ public class BookController {
     
     @PostMapping
     public BookResponse createBook(@RequestBody @Valid CreateBookRequest request) {
-        Book book=bookService.addBook(
+        return bookService.addBook(
                 request.getName(),
                 request.getAuthor(),
                 request.getDescription(),
-                request.getPrivate()
+                request.getIsPrivate()
         );
-        return BookMapper.toResponse(book);
     }
 
     @PatchMapping("/{id}")
-    public BookResponse updateBook(@PathVariable UUID id, @RequestBody UpdateBookRequest request) {
-        Book book=bookService.updateBook(
+    public BookResponse updateBook(
+            @PathVariable UUID id,
+            @RequestBody UpdateBookRequest request) {
+        return  bookService.updateBook(
                 id,
                 request.getName(),
                 request.getAuthor(),
                 request.getDescription(),
-                request.getPrivate()
+                request.getIsPrivate()
         );
-        return BookMapper.toResponse(book);
     }
 
     @DeleteMapping("/{id}")
@@ -55,31 +57,18 @@ public class BookController {
     @GetMapping
     public List<BookResponse> searchBooks(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String author){
-        List<Book> books;
-        if(name!=null && author!=null){
-            books = bookService.findByNameAndAuthor(name, author);
-        }
-        else if(name!=null){
-            books = bookService.findByName(name);
-        }
-        else if(author!=null){
-            books = bookService.findByAuthor(author);
-        }
-        else{
-            books=List.of();
-        }
-        return books.stream()
-                .map(BookMapper::toResponse)
-                .toList();
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) List<UUID> genreIds,
+            @RequestParam(required = false) BookSortType sortType,
+            @RequestParam(defaultValue = "ASC") SortDirection sortDirection){
+        return bookService.findBooks(name,author,genreIds,sortType,sortDirection);
     }
 
     @PostMapping("/{id}/genres/{genreId}")
     public BookResponse addGenre(
             @PathVariable UUID id,
             @PathVariable UUID genreId) {
-        Book book=bookService.addGenreToBook(id, genreId);
-        return BookMapper.toResponse(book);
+        return bookService.addGenreToBook(id, genreId);
     }
 
     @DeleteMapping("{bookId}/genres/{genreId}")
@@ -87,8 +76,7 @@ public class BookController {
             @PathVariable UUID bookId,
             @PathVariable UUID genreId
     ){
-        Book book=bookService.deleteGenreFromBook(bookId, genreId);
-        return BookMapper.toResponse(book);
+        return bookService.deleteGenreFromBook(bookId, genreId);
     }
 
     @GetMapping("/{bookId}/genres")

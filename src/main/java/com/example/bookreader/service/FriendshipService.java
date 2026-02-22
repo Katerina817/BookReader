@@ -2,7 +2,7 @@ package com.example.bookreader.service;
 
 import com.example.bookreader.DTO.FriendshopControllerDTO.FriendshipResponse;
 import com.example.bookreader.entity.Friendship;
-import com.example.bookreader.entity.FriendshipStatus;
+import com.example.bookreader.enums.FriendshipStatus;
 import com.example.bookreader.entity.User;
 import com.example.bookreader.repository.FriendshipRepository;
 import org.springframework.stereotype.Service;

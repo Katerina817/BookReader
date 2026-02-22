@@ -4,7 +4,9 @@ import com.example.bookreader.entity.Genre;
 import com.example.bookreader.repository.GenreRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -29,6 +31,15 @@ public class GenreService {
         return genreRepository.findById(genreId)
                 .orElseThrow(() -> new RuntimeException("Genre not found"));
     }
+
+    public Set<Genre> getGenresByIds(List<UUID> genreIds) {
+        Set<Genre> genres=new HashSet<>();
+        for(UUID genreId : genreIds) {
+            genres.add(getGenreById(genreId));
+        }
+        return genres;
+    }
+
     public Genre findGenreByName(String name) {
         return genreRepository.findByName(name)
                 .orElseThrow(() -> new RuntimeException("Genre not found"));

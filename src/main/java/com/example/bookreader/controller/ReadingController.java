@@ -3,13 +3,16 @@ package com.example.bookreader.controller;
 import com.example.bookreader.DTO.ReadingControllerDTO.*;
 import com.example.bookreader.DTO.ReadingControllerDTO.Response.BaseReadingResponse;
 import com.example.bookreader.DTO.ReadingControllerDTO.Response.ReadingOwnerResponse;
+import com.example.bookreader.DTO.ReadingControllerDTO.Response.ReadingViewerResponse;
 import com.example.bookreader.entity.Reading;
 import com.example.bookreader.entity.User;
 import com.example.bookreader.mapper.ReadingMapper;
+import com.example.bookreader.service.BookService;
 import com.example.bookreader.service.FriendshipService;
 import com.example.bookreader.service.ReadingService;
 import com.example.bookreader.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +24,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/readings")
 public class ReadingController {
     private final ReadingService readingService;
-    private final UserService userService;
-    private final FriendshipService friendshipService;
+    private final BookService bookService;
 
-    public ReadingController(ReadingService readingService, UserService userService, FriendshipService friendshipService) {
+    public ReadingController(ReadingService readingService, BookService bookService) {
         this.readingService = readingService;
-        this.userService = userService;
-        this.friendshipService = friendshipService;
+        this.bookService = bookService;
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -69,30 +70,25 @@ public class ReadingController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping
-    public List<ReadingOwnerResponse> getMyReadings() {
-        return readingService.getAllReadingsByUser()
-                .stream()
-                .map(ReadingMapper::toReadingOwnerResponse)
-                .collect(Collectors.toList());
+    @GetMapping("/me")
+    public List<? extends BaseReadingResponse> getMyReadings() {
+        return readingService.getMyReadings();
     }
-    @GetMapping("/users/{userId}")
-    public List<? extends BaseReadingResponse> getUserReadings(
-            @PathVariable UUID userId
-    ) {
-        User viewer=userService.getCurrentUser();
 
-        return readingService.getUserReadings(userId)
-                .stream()
-                .map(reading -> {
-                    if(reading.getUser().getId().equals(viewer.getId())) {
-                        return ReadingMapper.toReadingOwnerResponse(reading);
-                    }
-                    if(friendshipService.existsFriendship(reading.getUser(), viewer)) {
-                        return ReadingMapper.toReadingFriendResponse(reading);
-                    }
-                    return ReadingMapper.toReadingViewerResponse(reading);
-                })
-                .collect(Collectors.toList());
+    @GetMapping
+    public List<? extends BaseReadingResponse> getUserReadings(
+            @RequestParam UUID userId
+    ) {
+        return readingService.getUserReadings(userId);
     }
+
+
+    /*@PreAuthorize("hasRole('USER')")
+    @GetMapping
+    public List<ReadingViewerResponse> getReadingsByBook(@PathVariable UUID bookId) {
+        return readingService.getReadingsByBook(bookService.getBookById(bookId))
+                .stream()
+                .map(ReadingMapper::toReadingViewerResponse)
+                .collect(Collectors.toList());
+    }*/
 }
