@@ -42,7 +42,7 @@ public class ReadingMapper {
                 .toList());
         dto.setBookGenres(reading.getBook().getGenres()
                 .stream()
-                .map(Genre::getName)
+                .map(Genre::getId)
                 .toList());
         return dto;
     }
@@ -65,7 +65,7 @@ public class ReadingMapper {
         dto.setReview(reading.getReview());
         dto.setBookGenres(reading.getBook().getGenres()
                 .stream()
-                .map(Genre::getName)
+                .map(Genre::getId)
                 .toList());
         return dto;
     }
@@ -78,9 +78,10 @@ public class ReadingMapper {
         dto.setBookId(reading.getBook().getId());
         dto.setAuthor(reading.getBook().getAuthor());
         dto.setName(reading.getBook().getName());
+        dto.setFinalMark(reading.getFinalMark());
         dto.setBookGenres(reading.getBook().getGenres()
                 .stream()
-                .map(Genre::getName)
+                .map(Genre::getId)
                 .toList());
         return dto;
     }

@@ -2,19 +2,20 @@ package com.example.bookreader.service;
 
 import com.example.bookreader.DTO.ReadingControllerDTO.Response.BaseReadingResponse;
 import com.example.bookreader.entity.Book;
+import com.example.bookreader.entity.Genre;
 import com.example.bookreader.entity.Reading;
+import com.example.bookreader.enums.ReadingSortType;
 import com.example.bookreader.enums.ReadingStatus;
 import com.example.bookreader.entity.User;
 import com.example.bookreader.enums.ReadingViewType;
+import com.example.bookreader.enums.SortDirection;
 import com.example.bookreader.mapper.ReadingMapper;
 import com.example.bookreader.repository.ReadingRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,7 +64,14 @@ public class ReadingService {
         }
         return readingRepository.findByUserAndPrivateReadingFalse(owner);
     }*/
-    public List<? extends BaseReadingResponse> getUserReadings(UUID ownerId) {
+
+    /*public List<? extends BaseReadingResponse> getUserReadings(UUID ownerId,
+                                                               ReadingStatus status,
+                                                               String name,
+                                                               String author,
+                                                               List<String> genres,
+                                                               ReadingSortType sortType,
+                                                               SortDirection sortDirection) {
         User viewer=getCurrentUser(); User owner;
         if(ownerId==null){
             owner=getCurrentUser();
@@ -87,8 +95,98 @@ public class ReadingService {
                 .stream()
                 .map(reading -> ReadingMapper.map(reading,ReadingViewType.VIEWER))
                 .collect(Collectors.toList());
+    }*/
+
+
+    public List<? extends BaseReadingResponse> getUserReadings(UUID ownerId,
+                                                               ReadingStatus status,
+                                                               String name,
+                                                               String author,
+                                                               List<UUID> genres,
+                                                               ReadingSortType sortType,
+                                                               SortDirection sortDirection) {
+        User viewer=getCurrentUser(); User owner;
+        if(ownerId==null){
+            owner=getCurrentUser();
+        }else {
+            owner=userService.getUserById(ownerId);
+        }
+        List<Reading> readings;
+        ReadingViewType readingViewType;
+        //если тот кто просматривает и есть владелец reading
+        if(viewer.getId().equals(owner.getId())){
+            readingViewType=ReadingViewType.OWNER;
+            readings= getReadingsByNameAndAuthor(owner,name,author,true);
+        }else if(friendshipService.existsFriendship(owner, viewer)){
+            readingViewType=ReadingViewType.FRIEND;
+            readings= getReadingsByNameAndAuthor(owner,name,author,false);
+        }else{
+            readingViewType=ReadingViewType.VIEWER;
+
+            readings= getReadingsByNameAndAuthor(owner,name,author,false);
+        }
+        if (status != null) {
+            readings=readings.stream()
+                    .filter(reading -> reading.getStatus().equals(status))
+                    .toList();
+        }
+        if (genres!= null && !genres.isEmpty()) {
+            readings=readings.stream()
+                    .filter(reading -> new HashSet<>(reading.getBook()
+                            .getGenres())
+                            .stream()
+                            .map(Genre::getId)
+                            .collect(Collectors.toSet())
+                            .containsAll(genres))
+                    .toList();
+        }
+        if(sortType!=null){
+            Comparator<Reading>comparator=switch (sortType){
+                case MARK -> Comparator.comparing(Reading::getFinalMark,Comparator.nullsLast(Double::compareTo));
+                case NAME -> Comparator.comparing(reading -> reading.getBook().getName());
+                case AUTHOR -> Comparator.comparing(reading -> reading.getBook().getAuthor());
+            };
+            if(sortDirection==SortDirection.DESC){
+                comparator=comparator.reversed();
+            }
+            readings=readings.stream().sorted(comparator).collect(Collectors.toList());
+        }
+        return readings.stream()
+                .map(reading -> ReadingMapper.map(reading, readingViewType))
+                .toList();
     }
 
+    private List<Reading>getReadingsByNameAndAuthor(User owner, String name, String author,boolean isOwner) {
+        if(isOwner){
+            if(name!=null && author!=null){
+                return readingRepository.findByUserAndBookAuthorContainingIgnoreCaseAndBookNameContainingIgnoreCase(owner,name, author);
+            }
+            else if(name!=null){
+                return readingRepository.findByUserAndBookNameContainingIgnoreCase(owner, name);
+            }
+            else if(author!=null){
+                return readingRepository.findByUserAndBookAuthorContainingIgnoreCase(owner,author);
+            }
+            else{
+                return readingRepository.findByUser(owner);
+            }
+        }
+        else{
+            if(name!=null && author!=null){
+                return readingRepository.findByUserAndPrivateReadingFalseAndBookAuthorContainingIgnoreCaseAndBookNameContainingIgnoreCase(owner,name, author);
+            }
+            else if(name!=null){
+                return readingRepository.findByUserAndPrivateReadingFalseAndBookNameContainingIgnoreCase(owner, name);
+            }
+            else if(author!=null){
+                return readingRepository.findByUserAndPrivateReadingFalseAndBookAuthorContainingIgnoreCase(owner,author);
+            }
+            else{
+                return readingRepository.findByUserAndPrivateReadingFalse(owner);
+            }
+        }
+
+    }
     public Reading createReading(UUID bookId,ReadingStatus readingStatus,LocalDateTime dateStartOfReading, Boolean privateReading) {
         User user=getCurrentUser();
         Book book=bookService.getBookById(bookId);

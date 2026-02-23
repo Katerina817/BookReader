@@ -15,13 +15,19 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
     WHERE (b.isPrivate=false OR b.user=:user)
     AND lower(b.name) LIKE lower(concat('%', :name, '%'))
     """)
-    List<Book> findByNameContainingIgnoreCase(@Param("user") User user, @Param("name")String name);
+    List<Book> findByNameContainingIgnoreCase(
+            @Param("user") User user,
+            @Param("name")String name);
+
     @Query("""
     SELECT b FROM Book b
     WHERE (b.isPrivate=false OR b.user=:user)
     AND lower(b.author) LIKE lower(concat('%', :author, '%'))
     """)
-    List<Book> findByAuthorContainingIgnoreCase(@Param("user") User user, @Param("author")String author);
+    List<Book> findByAuthorContainingIgnoreCase(
+            @Param("user") User user,
+            @Param("author")String author);
+
     @Query("""
     SELECT COUNT(b) > 0 FROM Book b
     WHERE (b.isPrivate=false OR b.user=:user)
@@ -33,6 +39,7 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
             @Param("name")String name,
             @Param("author")String author
     );
+
     @Query("""
     SELECT b FROM Book b
     WHERE (b.isPrivate=false OR b.user=:user)
@@ -44,6 +51,7 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
             @Param("name")String name,
             @Param("author")String author
     );
+
     @Query("""
     SELECT b FROM Book b
     WHERE (b.isPrivate=false OR b.user=:user)

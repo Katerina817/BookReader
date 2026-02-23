@@ -6,6 +6,9 @@ import com.example.bookreader.DTO.ReadingControllerDTO.Response.ReadingOwnerResp
 import com.example.bookreader.DTO.ReadingControllerDTO.Response.ReadingViewerResponse;
 import com.example.bookreader.entity.Reading;
 import com.example.bookreader.entity.User;
+import com.example.bookreader.enums.ReadingSortType;
+import com.example.bookreader.enums.ReadingStatus;
+import com.example.bookreader.enums.SortDirection;
 import com.example.bookreader.mapper.ReadingMapper;
 import com.example.bookreader.service.BookService;
 import com.example.bookreader.service.FriendshipService;
@@ -77,9 +80,15 @@ public class ReadingController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping
     public List<? extends BaseReadingResponse> getUserReadings(
-            @RequestParam(required = false) UUID userId
-    ) {
-        return readingService.getUserReadings(userId);
+            @RequestParam(required = false)UUID userId,
+            @RequestParam(required = false)ReadingStatus status,
+            @RequestParam(required = false)String name,
+            @RequestParam(required = false)String author,
+            @RequestParam(required = false)List<UUID> genres,
+            @RequestParam(required = false)ReadingSortType sortType,
+            @RequestParam(defaultValue = "ASC") SortDirection sortDirection
+            ) {
+        return readingService.getUserReadings(userId,status,name,author,genres,sortType,sortDirection);
     }
 
 

@@ -13,7 +13,6 @@ public class ReadingFriendResponse extends BaseReadingResponse {
     private Integer evaluationOfEmotions;
     private Integer qualityOfDialog;
     private Integer atmosphere;
-    private Double finalMark;
     private String review;
 }
 

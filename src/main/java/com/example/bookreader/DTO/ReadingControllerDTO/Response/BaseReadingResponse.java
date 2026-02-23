@@ -13,10 +13,12 @@ public class BaseReadingResponse {
     private UUID bookId;
     private String name;
     private String author;
+    private Double finalMark;
+
 
     private UUID userId;
     private String login;
 
-    private List<String> bookGenres;
+    private List<UUID> bookGenres;
 
 }
