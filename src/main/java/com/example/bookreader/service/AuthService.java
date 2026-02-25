@@ -6,11 +6,13 @@ import com.example.bookreader.DTO.AuthControllerDTO.RegisterRequest;
 import com.example.bookreader.entity.User;
 import com.example.bookreader.repository.UserRepository;
 import com.example.bookreader.security.JwtService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;

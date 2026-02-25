@@ -10,7 +10,8 @@ import com.example.bookreader.entity.Genre;
 import com.example.bookreader.entity.User;
 import com.example.bookreader.mapper.BookMapper;
 import com.example.bookreader.repository.BookRepository;
-import lombok.Locked;
+import com.example.bookreader.specification.BookSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,7 +28,13 @@ public class BookService {
         this.userService = userService;
     }
 
-    public List<BookResponse> findBooks(String name, String author, List<UUID> genreIds, BookSortType sortType, SortDirection sortDirection) {
+    /*public List<BookResponse> findBooks(
+            String name,
+            String author,
+            List<UUID> genreIds,
+
+            BookSortType sortType,
+            SortDirection sortDirection) {
         List<Book> books;
         User user = getCurrentUser();
         if(name!=null && author!=null){
@@ -74,12 +81,87 @@ public class BookService {
         }
         return comparator;
     }
+    */
+    public List<BookResponse> findBooks(
+            String name,
+            String author,
+            List<UUID> genreIds,
+
+            BookSortType sortType,
+            SortDirection sortDirection) {
+
+        User user = getCurrentUser();
+
+        Specification<Book> specification = BookSpecification.bookHasName(name)
+                .and(BookSpecification.bookHasAuthor(author))
+                .and(BookSpecification.bookHasGenres(genreIds))
+                .and(BookSpecification.bookVisibleTo(user));
+
+        List<BookResponse> responses =
+                bookRepository.findAll(specification)
+                        .stream()
+                        .map(this::getBookResponse)
+                        .toList();
+        //сортировка
+        if(sortType!=null){
+            Comparator<BookResponse> comparator = switch (sortType){
+                case NAME -> Comparator.comparing(BookResponse::getName);
+                case AUTHOR -> Comparator.comparing(BookResponse::getAuthor);
+                case MARK -> Comparator.comparing(BookResponse::getAverageMark,
+                        Comparator.nullsLast(Double::compareTo));
+            };
+
+            if(sortDirection == SortDirection.DESC){
+                comparator = comparator.reversed();
+            }
+            responses= responses.stream().sorted(comparator).toList();
+        }
+
+        return responses;
+    }
+    */
+    public List<BookResponse> findBooks(
+            String name,
+            String author,
+            List<UUID> genreIds,
+
+            BookSortType sortType,
+            SortDirection sortDirection) {
+
+        User user = getCurrentUser();
+
+        Specification<Book> specification = BookSpecification.bookHasName(name)
+                .and(BookSpecification.bookHasAuthor(author))
+                .and(BookSpecification.bookHasGenres(genreIds))
+                .and(BookSpecification.bookVisibleTo(user));
+
+        List<BookResponse> responses =
+                bookRepository.findAll(specification)
+                        .stream()
+                        .map(this::getBookResponse)
+                        .toList();
+        //сортировка
+        if(sortType!=null){
+            Comparator<BookResponse> comparator = switch (sortType){
+                case NAME -> Comparator.comparing(BookResponse::getName);
+                case AUTHOR -> Comparator.comparing(BookResponse::getAuthor);
+                case MARK -> Comparator.comparing(BookResponse::getAverageMark,
+                        Comparator.nullsLast(Double::compareTo));
+            };
+
+            if(sortDirection == SortDirection.DESC){
+                comparator = comparator.reversed();
+            }
+            responses= responses.stream().sorted(comparator).toList();
+        }
+
+        return responses;
+    }
 
     private BookResponse getBookResponse(Book book) {
         List<Reading>publicReadings = book.getReadings()
                 .stream()
-                .filter(r->
-                        !r.getPrivateReading()
+                .filter(r-> !r.getPrivateReading()
                 && (r.getStatus()== ReadingStatus.FINISHED ||r.getStatus()== ReadingStatus.DROPPED)
                 && r.getFinalMark()!=null)
                 .toList();

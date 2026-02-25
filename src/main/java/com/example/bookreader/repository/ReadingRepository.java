@@ -5,12 +5,13 @@ import com.example.bookreader.entity.Reading;
 import com.example.bookreader.enums.ReadingStatus;
 import com.example.bookreader.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ReadingRepository extends JpaRepository<Reading, UUID> {
+public interface ReadingRepository extends JpaRepository<Reading, UUID>, JpaSpecificationExecutor<Reading> {
 
     List<Reading> findByUser(User user);
     List<Reading> findByUserAndBookNameContainingIgnoreCase(User user, String bookName);
@@ -30,4 +31,5 @@ public interface ReadingRepository extends JpaRepository<Reading, UUID> {
     List<Reading> findByUserAndPrivateReadingFalseAndBookAuthorContainingIgnoreCaseAndBookNameContainingIgnoreCase(User user, String book_author, String book_name);
 
     List<Reading> findByBookAndPrivateReadingFalse(Book book);
+
 }

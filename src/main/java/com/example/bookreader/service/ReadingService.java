@@ -11,6 +11,8 @@ import com.example.bookreader.enums.ReadingViewType;
 import com.example.bookreader.enums.SortDirection;
 import com.example.bookreader.mapper.ReadingMapper;
 import com.example.bookreader.repository.ReadingRepository;
+import com.example.bookreader.specification.ReadingSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -98,7 +100,7 @@ public class ReadingService {
     }*/
 
 
-    public List<? extends BaseReadingResponse> getUserReadings(UUID ownerId,
+    /*public List<? extends BaseReadingResponse> getUserReadings(UUID ownerId,
                                                                ReadingStatus status,
                                                                String name,
                                                                String author,
@@ -155,7 +157,6 @@ public class ReadingService {
                 .map(reading -> ReadingMapper.map(reading, readingViewType))
                 .toList();
     }
-
     private List<Reading>getReadingsByNameAndAuthor(User owner, String name, String author,boolean isOwner) {
         if(isOwner){
             if(name!=null && author!=null){
@@ -187,6 +188,57 @@ public class ReadingService {
         }
 
     }
+    */
+
+    public List<? extends BaseReadingResponse> getUserReadings(UUID ownerId,
+                                                               ReadingStatus status,
+                                                               String name,
+                                                               String author,
+                                                               List<UUID> genres,
+                                                               ReadingSortType sortType,
+                                                               SortDirection sortDirection) {
+        User viewer=getCurrentUser(); User owner;
+        if(ownerId==null){
+            owner=getCurrentUser();
+        }else {
+            owner=userService.getUserById(ownerId);
+        }
+        Specification<Reading>spec = ReadingSpecification.hasOwner(owner)
+                .and(ReadingSpecification.isVisibleFor(viewer,owner))
+                .and(ReadingSpecification.hasStatus(status))
+                .and(ReadingSpecification.bookHasAuthor(author))
+                .and(ReadingSpecification.bookHasName(name))
+                .and(ReadingSpecification.bookHasGenres(genres));
+
+        if(sortType!=null){
+            Comparator<Reading>comparator=switch (sortType){
+                case MARK -> Comparator.comparing(Reading::getFinalMark,Comparator.nullsLast(Double::compareTo));
+                case NAME -> Comparator.comparing(reading -> reading.getBook().getName());
+                case AUTHOR -> Comparator.comparing(reading -> reading.getBook().getAuthor());
+            };
+            if(sortDirection==SortDirection.DESC){
+                comparator=comparator.reversed();
+            }
+            return readingRepository.findAll(spec).stream().sorted(comparator)
+                    .map(reading -> ReadingMapper.map(reading, getViewType(owner,viewer)))
+                    .toList();
+        }
+        return readingRepository.findAll(spec).stream().map(reading -> ReadingMapper.map(reading, getViewType(owner,viewer)))
+                .toList();
+    }
+
+    private ReadingViewType getViewType(User owner,User viewer) {
+
+        if(viewer.getId().equals(owner.getId())){
+            return ReadingViewType.OWNER;
+        }else if(friendshipService.existsFriendship(owner, viewer)){
+            return ReadingViewType.FRIEND;
+        }else{
+            return ReadingViewType.VIEWER;
+        }
+    }
+
+
     public Reading createReading(UUID bookId,ReadingStatus readingStatus,LocalDateTime dateStartOfReading, Boolean privateReading) {
         User user=getCurrentUser();
         Book book=bookService.getBookById(bookId);
@@ -210,42 +262,42 @@ public class ReadingService {
         return readingRepository.save(reading);
     }
     public Reading updateReading(UUID readingId, ReadingStatus newStatus, LocalDateTime dateStartOfReading, LocalDateTime dateEndOfReading,Integer evaluationOfCharacter, Integer evaluationOfPlot, Integer evaluationOfEmotions,Integer qualityOfDialog, Integer atmosphere, String review, Boolean privateReading) {
-       Reading reading=getReadingForOwner(readingId);
-       Book book=bookService.getBookById(reading.getBook().getId());
+        Reading reading=getReadingForOwner(readingId);
+        Book book=bookService.getBookById(reading.getBook().getId());
         if (book.isPrivate()==Boolean.TRUE){
             reading.setPrivateReading(true);
         }else if (privateReading!=null){
             reading.setPrivateReading(privateReading);
         }
-       if(newStatus!=null) {
-           reading.setStatus(newStatus);
-           if (newStatus == ReadingStatus.READING)
-               reading.setDateStartOfReading(Objects.requireNonNullElseGet(dateStartOfReading, LocalDateTime::now));
-           if (newStatus == ReadingStatus.FINISHED || newStatus == ReadingStatus.DROPPED)
-               reading.setDateFinishOfReading(Objects.requireNonNullElseGet(dateEndOfReading, LocalDateTime::now));
-       }
-       if(isRatingAllowed(reading,newStatus)){
-           if(evaluationOfCharacter==null && evaluationOfPlot==null && evaluationOfEmotions==null && qualityOfDialog==null && atmosphere==null){
-               throw new RuntimeException("There is no evaluations");
-           }
-           List<Integer> numbers=new ArrayList<>();
-           reading.setEvaluationOfCharacter(evaluationOfCharacter);
-           numbers.add(evaluationOfCharacter);
-           reading.setEvaluationOfPlot(evaluationOfPlot);
-           numbers.add(evaluationOfPlot);
-           reading.setEvaluationOfEmotions(evaluationOfEmotions);
-           numbers.add(evaluationOfEmotions);
-           reading.setQualityOfDialog(qualityOfDialog);
-           numbers.add(qualityOfDialog);
-           reading.setAtmosphere(atmosphere);
-           numbers.add(atmosphere);
-           if(review!=null) {
-               reading.setReview(review);
-           }
-           reading.setFinalMark(numbers.stream().mapToInt(Integer::intValue).average().getAsDouble());
-       }
+        if(newStatus!=null) {
+            reading.setStatus(newStatus);
+            if (newStatus == ReadingStatus.READING)
+                reading.setDateStartOfReading(Objects.requireNonNullElseGet(dateStartOfReading, LocalDateTime::now));
+            if (newStatus == ReadingStatus.FINISHED || newStatus == ReadingStatus.DROPPED)
+                reading.setDateFinishOfReading(Objects.requireNonNullElseGet(dateEndOfReading, LocalDateTime::now));
+        }
+        if(isRatingAllowed(reading,newStatus)){
+            if(evaluationOfCharacter==null && evaluationOfPlot==null && evaluationOfEmotions==null && qualityOfDialog==null && atmosphere==null){
+                throw new RuntimeException("There is no evaluations");
+            }
+            List<Integer> numbers=new ArrayList<>();
+            reading.setEvaluationOfCharacter(evaluationOfCharacter);
+            numbers.add(evaluationOfCharacter);
+            reading.setEvaluationOfPlot(evaluationOfPlot);
+            numbers.add(evaluationOfPlot);
+            reading.setEvaluationOfEmotions(evaluationOfEmotions);
+            numbers.add(evaluationOfEmotions);
+            reading.setQualityOfDialog(qualityOfDialog);
+            numbers.add(qualityOfDialog);
+            reading.setAtmosphere(atmosphere);
+            numbers.add(atmosphere);
+            if(review!=null) {
+                reading.setReview(review);
+            }
+            reading.setFinalMark(numbers.stream().mapToInt(Integer::intValue).average().getAsDouble());
+        }
 
-       return readingRepository.save(reading);
+        return readingRepository.save(reading);
     }
     public void deleteReading(UUID readingId) {
         Reading reading=getReadingForOwner(readingId);
@@ -268,10 +320,4 @@ public class ReadingService {
         //если reading публичный, могут смотреть все
         return !reading.getPrivateReading();
     }
-
-    /*public List<Reading> getReadingMarkByBook(Book book) {
-        readingRepository.findByBookAndPrivateReadingFalse(book);
-    }*/
-
-
 }
